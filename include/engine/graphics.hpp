@@ -24,7 +24,7 @@ namespace shrk
    */
    struct Renderable
    {
-      virtual void render() const;
+      virtual void render() const = 0;
    };
 
    /* 
@@ -79,18 +79,26 @@ namespace shrk
       GLuint VBO, EBO;
       // arrays
       Vertex vertices[4] = {
-         {{-1.0f,  1.0f, 0.0f}, {0.f, 0.f}}, {{ 1.0f, 1.0f, 0.0f}, {1.f, 0.f}},
-         {{ 1.0f, -1.0f, 0.0f}, {1.f, 1.f}}, {{-1.0f, 1.0f, 0.0f}, {0.f, 1.f}}
+         {{-1.0f,  1.0f, 0.0f}, {0.f, 0.f}},
+         {{ 1.0f,  1.0f, 0.0f}, {1.f, 0.f}},
+         {{ 1.0f, -1.0f, 0.0f}, {1.f, 1.f}},
+         {{-1.0f,  1.0f, 0.0f}, {0.f, 1.f}}
       };
       uint8_t indices[6] = {
          0, 1, 2,
          0, 2, 3
       };
+
+      void init(GLuint &shaderID, GLuint &textureId);
    public:
       GLuint VAO;
       shrk::Sprite sprite;
 
-      Entity(GLuint shaderID, GLuint textureID);
+      Entity() = default;
+      Entity(GLuint shaderID, GLuint textureID)
+      {
+         init(shaderID, textureID);
+      }
 
       void render() const override;
    };

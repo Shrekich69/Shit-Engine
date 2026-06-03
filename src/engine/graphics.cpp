@@ -82,7 +82,7 @@ GLuint shrk::loadTexture(const char* path)
    return texID;
 }
 
-shrk::Entity::Entity(GLuint shaderID, GLuint textureID)
+void shrk::Entity::init(GLuint &shaderID, GLuint &textureID)
 {
    sprite.shaderID = shaderID;
    sprite.textureID = textureID;
@@ -94,10 +94,10 @@ shrk::Entity::Entity(GLuint shaderID, GLuint textureID)
    glBindVertexArray(VAO);
 
    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-   glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(shrk::Vertex), &vertices[0], GL_STATIC_DRAW);
+   glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(shrk::Vertex), vertices, GL_STATIC_DRAW);
 
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-   glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(uint8_t), &indices[0], GL_STATIC_DRAW);
+   glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(uint8_t), indices, GL_STATIC_DRAW);
 
    // position
    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(shrk::Vertex), (void*)0);
@@ -106,22 +106,28 @@ shrk::Entity::Entity(GLuint shaderID, GLuint textureID)
    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(shrk::Vertex), (void*)offsetof(shrk::Vertex, texCoord));
    glEnableVertexAttribArray(1);
 
+   if (auto err = glGetError() != 0)
+      SDL_Log("GL error in Entity: %U", err);
+
    glBindVertexArray(0);
 }
 
 void shrk::Entity::render() const
 {
    glUseProgram(sprite.shaderID);
-   glActiveTexture(GL_TEXTURE);
+   glActiveTexture(GL_TEXTURE0);
    glBindTexture(GL_TEXTURE_2D, sprite.textureID);
 
-   glm::mat4 model = glm::translate(glm::mat4(1.0f), sprite.pos);
-   model *= glm::scale(glm::mat4(1.0f), glm::vec3{sprite.scale, 0.0f});
-   model *= glm::rotate(glm::mat4(1.0f), sprite.rotation, glm::vec3{0.0f, 0.0f, 1.0f});
+   glm::mat4 model{1.0f};
+   glm::translate(model, sprite.pos);
+   // model *= glm::scale(glm::mat4(1.0f), glm::vec3{sprite.scale, 0.0f});
+   // model *= glm::rotate(glm::mat4(1.0f), sprite.rotation, glm::vec3{0.0f, 0.0f, 1.0f});
    GLint uni_model = glGetUniformLocation(sprite.shaderID, "model");
    glUniformMatrix4fv(uni_model, 1, GL_FALSE, &model[0][0]);
 
    glBindVertexArray(VAO);
    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
-   glBindVertexArray(0);
+
+   // if (auto err = glGetError() != 0)
+   //    SDL_Log("GL error in Entity::render(): %U", err);
 }

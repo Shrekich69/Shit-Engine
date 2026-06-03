@@ -1,11 +1,5 @@
-<<<<<<< HEAD
-.cache/
-out/
-CMakePresets.json
-=======
 .DS_Store
 .cache/
 out/
 CMakeLists.txt
 compile_commands.json
->>>>>>> 6cab490 (chngs)

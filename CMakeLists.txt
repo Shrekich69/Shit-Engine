@@ -5,6 +5,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(SDL3 REQUIRED)
 
+include(include/glm/CMakeLists.txt)
+
 set(IMGUI_SOURCES
    src/dearimgui/imgui_demo.cpp
    src/dearimgui/imgui_draw.cpp
